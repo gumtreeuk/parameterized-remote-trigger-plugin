@@ -583,11 +583,15 @@ public class RemoteBuildConfiguration extends Builder {
                 }
             }
         }
-        listener.getLogger().println("This job is build #[" + Integer.toString(nextBuildNumber) + "] on the remote server.");
-        BuildInfoExporterAction.addBuildInfoExporterAction(build, jobName, nextBuildNumber, Result.NOT_BUILT);
-        
+
         //Have to form the string ourselves, as we might not get a response from non-parameterized builds
         String jobURL = remoteServerURL + "/job/" + this.encodeValue(jobName) + "/";
+        String buildURL = jobURL + nextBuildNumber;
+
+        listener.getLogger().println(
+                "This job is build <a href=\"" + buildURL + "\">#[" + Integer.toString(nextBuildNumber) + "]</a> on the remote server."
+        );
+        BuildInfoExporterAction.addBuildInfoExporterAction(build, jobName, nextBuildNumber, Result.NOT_BUILT);
 
         // This is only for Debug
         // This output whether there is another job running on the remote host that this job had conflicted with.
@@ -611,7 +615,7 @@ public class RemoteBuildConfiguration extends Builder {
         if (this.getBlockBuildUntilComplete()) {
             listener.getLogger().println("Blocking local job until remote job completes");
             // Form the URL for the triggered job
-            String jobLocation = jobURL + nextBuildNumber + "/api/json";
+            String jobLocation = buildURL + nextBuildNumber + "/api/json";
 
             buildStatusStr = getBuildStatus(jobLocation, build, listener);
 
